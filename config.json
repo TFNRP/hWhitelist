@@ -1,26 +1,13 @@
 {
   "Convars": {
-    "UseJSON": false
+    "UseJSON": false,
+    "PreferredIdentifier": "steam"
   },
   "Groups": {
-    "staff": {
 
-    },
-    "member": {
-
-    }
   },
   "Hierarchy": {
-    "owner": {
-      "name": "Owner",
-      "group": "staff",
-      "allowed": [
-        "hwhitelist.whitelist.add.all",
-        "hwhitelist.whitelist.remove.all",
-        "hwhitelist.whitelist.manage"
-      ]
-    },
-    "admin": {
+    "everyone": {
 
     }
   }
