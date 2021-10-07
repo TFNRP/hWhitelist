@@ -114,7 +114,7 @@ function IterateGroups (iterator)
     if type(key) == 'string' and type(Group) == 'table' then
       Config.Group[key].name = key
     end
-    iterator(Group)
+    iterator(Group, key)
   end
 end
 
@@ -123,7 +123,7 @@ function IterateRoles (iterator)
     if type(key) == 'string' and type(Role) == 'table' then
       Config.Hierarchy[key].name = key
     end
-    iterator(Role)
+    iterator(Role, key)
   end
 end
 
@@ -149,8 +149,8 @@ function ValidateConfig()
   end
 
   local registeredGroups = {}
-  IterateGroups(function (Group)
-    ValidateGroup(Group)
+  IterateGroups(function (Group, key)
+    Config.Groups[key] = ValidateGroup(Group)
     if registeredGroups[Group.name] then
       error('Group \'' .. Group.name .. '\' already exists')
     end
@@ -158,8 +158,8 @@ function ValidateConfig()
   end)
 
   local registeredRoles = {}
-  IterateRoles(function (Role)
-    ValidateRole(Role)
+  IterateRoles(function (Role, key)
+    Config.Hierarchy[key] = ValidateRole(Role)
     if registeredRoles[Role.name] then
       error('Role \'' .. Role.name .. '\' already exists')
     end
@@ -210,15 +210,26 @@ function ValidateGroup (Group)
   if type(Group.name) ~= 'string' then
     error('<Group>.name must be type of string, got \'' .. type(Group.name) .. '\'')
   end
-  if Group.displayName and type(Group.displayName) ~= 'string' then
-    error('<Group>.displayName must be type of string or nil, got \'' .. type(Group.displayName) .. '\'')
+  if Group.displayName then Group.display = Group.displayName end
+  if Group.display and type(Group.display) ~= 'string' then
+    error('<Group>.display must be type of string or nil, got \'' .. type(Group.display) .. '\'')
   end
-  if Group.allowed and not IsInArray({ 'string', 'table' }, type(Group.allowed)) then
-    error('<Group>.allowed must be type of string, table or nil, got \'' .. type(Group.allowed) .. '\'')
+  if Group.allowed and not type(Group.allowed) == 'table' then
+    if type(Group.allowed) == 'string' then
+      Group.allowed = { Group.allowed }
+    else
+      error('<Group>.allowed must be type of string, table or nil, got \'' .. type(Group.allowed) .. '\'')
+    end
   end
-  if Group.denied and not IsInArray({ 'string', 'table' }, type(Group.denied)) then
-    error('<Group>.denied must be type of string, table or nil, got \'' .. type(Group.denied) .. '\'')
+  if Group.denied and not type(Group.denied) == 'table' then
+    if type(Group.denied) == 'string' then
+      Group.denied = { Group.denied }
+    else
+      error('<Group>.denied must be type of string, table or nil, got \'' .. type(Group.denied) .. '\'')
+    end
   end
+
+  return Group
 end
 
 function ValidateRole (Role)
@@ -228,8 +239,9 @@ function ValidateRole (Role)
   if type(Role.name) ~= 'string' then
     error('<Role>.name must be type of string, got \'' .. type(Role.name) .. '\'')
   end
-  if Role.displayName and type(Role.displayName) ~= 'string' then
-    error('<Role>.displayName must be type of string or nil, got \'' .. type(Role.displayName) .. '\'')
+  if Role.displayName then Role.display = Role.displayName end
+  if Role.display and type(Role.display) ~= 'string' then
+    error('<Role>.display must be type of string or nil, got \'' .. type(Role.display) .. '\'')
   end
   if Role.group then
     if type(Role.group) ~= 'string' then
@@ -239,10 +251,20 @@ function ValidateRole (Role)
       error('Group \'' .. Role.group .. '\' does not exist for role \'' .. Role.name .. '\'')
     end
   end
-  if Role.allowed and not IsInArray({ 'string', 'table' }, type(Role.allowed)) then
-    error('<Role>.allowed must be type of string, table or nil, got \'' .. type(Role.allowed) .. '\'')
+  if Role.allowed and not type(Role.allowed) == 'table' then
+    if type(Role.allowed) == 'string' then
+      Role.allowed = { Role.allowed }
+    else
+      error('<Role>.allowed must be type of string, table or nil, got \'' .. type(Role.allowed) .. '\'')
+    end
   end
-  if Role.denied and not IsInArray({ 'string', 'table' }, type(Role.denied)) then
-    error('<Role>.denied must be type of string, table or nil, got \'' .. type(Role.denied) .. '\'')
+  if Role.denied and not type(Role.denied) == 'table' then
+    if type(Role.denied) == 'string' then
+      Role.denied = { Role.denied }
+    else
+      error('<Role>.denied must be type of string, table or nil, got \'' .. type(Role.denied) .. '\'')
+    end
   end
+
+  return Role
 end
