@@ -112,7 +112,7 @@ end
 function IterateGroups (iterator)
   for key, Group in pairs(Config.Groups) do
     if type(key) == 'string' and type(Group) == 'table' then
-      Group.name = key
+      Config.Group[key].name = key
     end
     iterator(Group)
   end
@@ -121,7 +121,7 @@ end
 function IterateRoles (iterator)
   for key, Role in pairs(Config.Hierarchy) do
     if type(key) == 'string' and type(Role) == 'table' then
-      Role.name = key
+      Config.Hierarchy[key].name = key
     end
     iterator(Role)
   end
