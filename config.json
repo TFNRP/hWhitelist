@@ -1,4 +1,7 @@
 {
+  "Convars": {
+    "UseJSON": false
+  },
   "Groups": {
     "staff": {
 
