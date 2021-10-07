@@ -110,18 +110,18 @@ function RemovePlayerWhitelist (player, whitelist)
 end
 
 function IterateGroups (iterator)
-  for Extra, Group in pairs(Config.Groups) do
-    if type(Extra) == 'string' and type(Group) == 'table' then
-      Group.name = Extra
+  for key, Group in pairs(Config.Groups) do
+    if type(key) == 'string' and type(Group) == 'table' then
+      Group.name = key
     end
     iterator(Group)
   end
 end
 
 function IterateRoles (iterator)
-  for Extra, Role in pairs(Config.Hierarchy) do
-    if type(Extra) == 'string' and type(Role) == 'table' then
-      Role.name = Extra
+  for key, Role in pairs(Config.Hierarchy) do
+    if type(key) == 'string' and type(Role) == 'table' then
+      Role.name = key
     end
     iterator(Role)
   end
