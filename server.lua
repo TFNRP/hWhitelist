@@ -8,6 +8,12 @@ AddEventHandler('onResourceStop', function (name)
   end
 end)
 
+if Config.Convars.Discord then
+  AddEventHandler('playerConnecting', function (name, setKickReason, deferrals)
+    
+  end)
+end
+
 local commands = {}
 local aliases = {
   a = 'add',

@@ -12,7 +12,13 @@ Config = {
       - fivem
       - ip
     --]]
-    PreferredIdentifier = 'steam'
+    PreferredIdentifier = 'steam',
+    Discord = {
+      -- The id of the server to check roles from
+      GuildId = '463778631551025187',
+      -- The token of the bot account to use
+      Token = 'MTk4NjIyNDgzNDcxOTI1MjQ4.Cl2FMQ.ZnCjm1XVW7vRze4b7Cq4se7kKWs',
+    },
   },
 
   Groups = {
@@ -83,6 +89,7 @@ Config = {
 
     {
       name = 'donator',
+      role = '891105525381599284',
       displayName = 'VIP',
       group = 'member',
       allowed = {

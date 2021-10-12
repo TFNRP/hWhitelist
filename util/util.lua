@@ -1,4 +1,3 @@
-RegisterFrameworkCommand = exports.framework.RegisterFrameworkCommand
 if RegisterFrameworkCommand == nil then
   -- polyfill
   RegisterFrameworkCommand = function (name, handler, restricted)
@@ -12,12 +11,27 @@ if RegisterFrameworkCommand == nil then
   end
 end
 
-Constants = {
-  Identifiers = {
-    'steam', 'license', 'license2', 'discord',
-    'xbl', 'live', 'fivem', 'ip',
-  },
-}
+function DiscordFetchMember(userId)
+  local response = {}
+  PerformHttpRequest(
+    Constants.Discord.Base .. Config.Convars.Discord.Version .. '/guilds/' .. Config.Convars.Discord.GuildId .. '/members/' .. userId,
+    function (code, result, headers)
+      response.code = code
+      response.json = result
+    end,
+    'GET',
+    {
+      ['Content-Type'] = 'application/json',
+      ['Authorization'] = Config.Convars.Discord.Token,
+      ['User-Agent'] = Config.Convars.Discord.UserAgent,
+    }
+  )
+
+  while response.code == nil do Citizen.Wait(0) end
+  if response.code ~= 200 then return false, response end
+  response.json = json.decode(response.json)
+  return true, response
+end
 
 function LoadConfig()
   Config = nil
@@ -131,9 +145,7 @@ function ValidateConfig()
   if type(Config) ~= 'table' then
     error('Config must be type of table, got \'' .. type(Config) .. '\'')
   end
-  if type(Config.Convars) ~= 'table' then
-    error('Convars must be type of table, got \'' .. type(Config.Convars) .. '\'')
-  end
+  Config.Convars = ValidateConvars(Config.Convars)
   if type(Config.Groups) ~= 'table' then
     error('Groups must be type of table, got \'' .. type(Config.Groups) .. '\'')
   end
@@ -201,6 +213,48 @@ function ExecuteConfig(SetRoleAce)
       end
     end
   end)
+end
+
+function ValidateConvars (Convars)
+  if type(Convars) ~= 'table' then
+    error('Convars must be type of table, got \'' .. type(Convars) .. '\'')
+  end
+
+  if Convars.Discord then
+    if type(Convars.Discord) ~= 'table' then
+      error('Convars.Discord must be type of table or nil, got \'' .. type(Convars.Discord) .. '\'')
+    end
+    if type(Convars.Discord.Token) ~= 'string' then
+      error('Convars.Discord.Token must be type of string, got \'' .. type(Convars.Discord.Token) .. '\'')
+    end
+    if not Convars.Discord.Token:match('%w+\\.%w+\\.%w+$') then
+      error('Invalid Discord bot token')
+    end
+    if string.sub(Convars.Discord.Token, 1, string.len('Bot ')) ~= 'Bot ' then
+      Convars.Discord.Token = 'Bot ' .. Convars.Discord.Token
+    end
+    if type(Convars.Discord.GuildId) ~= 'string' then
+      error('Convars.Discord.GuildId must be type of string, got \'' .. type(Convars.Discord.GuildId) .. '\'')
+    end
+    if Convars.Discord.UserAgent then
+      if type(Convars.Discord.UserAgent) ~= 'string' then
+        error('Convars.Discord.UserAgent must be type of string or nil, got \'' .. type(Convars.Discord.UserAgent) .. '\'')
+      end
+    else
+      Convars.Discord.UserAgent = 'hWhitelist ' .. (GetResourceMetadata(GetCurrentResourceName(), 'version', 0) or 'v0.0.0')
+    end
+    if Convars.Discord.Version then
+      if type(Convars.Discord.Version) ~= 'string' then
+        error('Convars.Discord.Version must be type of string or nil, got \'' .. type(Convars.Discord.Version) .. '\'')
+      elseif not Convars.Discord.Version:match('^v%d+$') then
+        error('Invalid Discord API version, got \'' .. Convars.Discord.Version .. '\'')
+      end
+    else
+      Convars.Discord.Version = Constants.Discord.Version
+    end
+  end
+
+  return Convars
 end
 
 function ValidateGroup (Group)

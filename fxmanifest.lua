@@ -7,7 +7,8 @@ description 'FiveM resource for whitelisting.'
 repository 'https://github.com/TFNRP/hWhitelist'
 
 server_script {
-  'util.lua',
+  '@framework/util.lua',
+  'util/**/*.lua',
   'server.lua',
 }
 server_only 'true'
