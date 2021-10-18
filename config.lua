@@ -13,6 +13,8 @@ Config = {
       - ip
     --]]
     PreferredIdentifier = 'steam',
+    -- Only necessary for whitelists from Discord roles
+    -- Remove this convar if you don't want this
     Discord = {
       -- The id of the server to check roles from
       GuildId = '463778631551025187',
