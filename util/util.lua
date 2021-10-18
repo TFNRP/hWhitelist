@@ -68,7 +68,7 @@ function ParsePlayerIdentifiers (source)
   local ret = {}
   for _, value in ipairs(array) do
     for _, identifier in ipairs(Constants.Identifiers) do
-      if string.sub(value, 1, string.len(identifier)) == identifier then
+      if value:sub(1, identifier:len()) == identifier then
         ret[identifier] = value
         break
       end
