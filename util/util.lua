@@ -66,8 +66,8 @@ end
 function ParsePlayerIdentifiers (source)
   local array = GetPlayerIdentifiers(source)
   local ret = {}
-  for value in ipairs(array) do
-    for identifier in ipairs(Constants.Identifiers) do
+  for _, value in ipairs(array) do
+    for _, identifier in ipairs(Constants.Identifiers) do
       if string.sub(value, 1, string.len(identifier)) == identifier then
         ret[identifier] = value
         break
