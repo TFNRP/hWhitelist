@@ -69,7 +69,7 @@ function ParsePlayerIdentifiers (source)
   for _, value in ipairs(array) do
     for _, identifier in ipairs(Constants.Identifiers) do
       if value:sub(1, identifier:len()) == identifier then
-        ret[identifier] = value
+        ret[identifier] = value:sub(identifier:len() + 1, value:len())
         break
       end
     end
