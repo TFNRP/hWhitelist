@@ -33,6 +33,24 @@ function DiscordFetchMember(userId)
   return true, response
 end
 
+function GetDiscordRoleWhitelists()
+  local roles = {}
+
+  for _, role in pairs(Config.Hierarchy) do
+    if role.role then
+      if type(role.role) == 'table' then
+        for _, r in ipairs(role.role) do
+          roles[r] = role.name
+        end
+      else
+        roles[role.role] = role.name
+      end
+    end
+  end
+
+  return roles
+end
+
 function LoadConfig()
   Config = nil
   local jsonChunk = LoadResourceFile(GetCurrentResourceName(), 'config.json')

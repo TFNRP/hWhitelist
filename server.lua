@@ -9,8 +9,61 @@ AddEventHandler('onResourceStop', function (name)
 end)
 
 if Config.Convars.Discord then
+  local roleCache = {}
+
   AddEventHandler('playerConnecting', function (name, setKickReason, deferrals)
-    
+    local src = source
+    local identifiers = ParsePlayerIdentifiers(source)
+    if not identifiers.discord then return end
+    deferrals.defer()
+    Wait(0)
+
+    local success, data = DiscordFetchMember(identifiers.discord)
+    if not success then
+      if data.code ~= 404 then
+        -- something went wrong
+        local json = json.decode(data.json)
+        if json and json.message then
+          Citizen.Trace(json.message .. '\n')
+        end
+      end
+      goto finalise
+    end
+
+    local whitelists = GetDiscordRoleWhitelists()
+    if not roleCache[identifiers.discord] then
+      roleCache[identifiers.discord] = {}
+    end
+    for _, role in ipairs(data.json.roles) do
+      if whitelists[role] then
+        local success = AddPlayerWhitelist(src, 'hwhitelist.role.' .. whitelists[role])
+        if not success then
+          Citizen.Trace(
+            'Could not add student Discord id ' .. identifiers.discord                ..
+            ' to whitelist '                    .. whitelists[role]                   ..
+            ' using preffered identifier '      .. Config.Convars.PreferredIdentifier ..
+            '\n'
+          )
+        else
+          roleCache[identifiers.discord]:insert(whitelists[role])
+        end
+      end
+    end
+
+    ::finalise::
+    deferrals.done()
+  end)
+
+  AddEventHandler('playerDropped', function (reason)
+    local src = source
+    local identifiers = ParsePlayerIdentifiers(source)
+    if not identifiers.discord then return end
+    if roleCache[identifiers.discord] then
+      for _, role in roleCache[identifiers.discord] do
+        RemovePlayerWhitelist(src, 'hwhitelist.role.' .. role)
+      end
+      roleCache[identifiers.discord] = nil
+    end
   end)
 end
 
