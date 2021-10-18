@@ -92,7 +92,7 @@ function AddPlayerWhitelist (player, whitelist)
   if identifier == nil then
     return false
   end
-  ExecuteCommand('add_principal identifier:' .. identifier .. ' ' .. whitelist)
+  ExecuteCommand('add_principal identifier.' .. Config.Convars.PreferredIdentifier .. ':' .. identifier .. ' ' .. whitelist)
   return true
 end
 
@@ -119,7 +119,7 @@ function RemovePlayerWhitelist (player, whitelist)
   if identifier == nil then
     return false
   end
-  ExecuteCommand('remove_principal identifier:' .. identifier .. ' ' .. whitelist)
+  ExecuteCommand('remove_principal identifier.' .. Config.Convars.PreferredIdentifier .. ':' .. identifier .. ' ' .. whitelist)
   return true
 end
 
