@@ -63,7 +63,7 @@ function LoadConfig()
 end
 
 function IsInArray(arr, item)
-  for value in ipairs(arr) do
+  for _, value in ipairs(arr) do
     if value == item then return true end
   end
   return false
