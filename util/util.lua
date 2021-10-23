@@ -246,7 +246,7 @@ function ValidateConvars (Convars)
     if type(Convars.Discord.Token) ~= 'string' then
       error('Convars.Discord.Token must be type of string, got \'' .. type(Convars.Discord.Token) .. '\'')
     end
-    if not Convars.Discord.Token:match('%w+\\.%w+\\.%w+$') then
+    if not Convars.Discord.Token:match('%w+%.%w+%.%w+$') then
       error('Invalid Discord bot token')
     end
     if string.sub(Convars.Discord.Token, 1, string.len('Bot ')) ~= 'Bot ' then
