@@ -57,7 +57,7 @@ function LoadConfig()
   if jsonChunk and jsonChunk ~= '' then
     Config = json.decode(jsonChunk)
   end
-  if not Config and not Config.Convars and not Config.Convars.UseJSON then
+  if not Config or Config.Convars and not Config.Convars.UseJSON then
     assert(load(LoadResourceFile(GetCurrentResourceName(), 'config.lua')))()
   end
 end
