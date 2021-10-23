@@ -212,12 +212,12 @@ function ExecuteConfig(SetRoleAce)
     if Role.group then
       local Group = Config.Groups[Role.group]
       if Group.allowed then
-        for ace in ipairs(Group.allowed) do
+        for _, ace in ipairs(Group.allowed) do
           SetRoleAce(Role.name, ace)
         end
       end
       if Group.denied then
-        for ace in ipairs(Group.denied) do
+        for _, ace in ipairs(Group.denied) do
           SetRoleAce(Role.name, ace, false)
         end
       end
