@@ -179,28 +179,30 @@ function ValidateConfig()
     error('PreferredIdentifier must be one of \'' .. ArrayToString(Constants.Identifiers, '\', \'') .. '\', got \'' .. Config.Convars.PreferredIdentifier .. '\'')
   end
 
-  local registeredGroups = {}
-  IterateGroups(function (Group, key)
-    Config.Groups[key] = ValidateGroup(Group)
-    if registeredGroups[Group.name] then
+  local groups = {}
+  IterateGroups(function (Group)
+    local group = ValidateGroup(Group)
+    if groups[Group.name] then
       error('Group \'' .. Group.name .. '\' already exists')
     end
-    registeredGroups[Group.name] = true
+    groups[group.name] = group
   end)
+  Config.Groups = groups
 
-  local registeredRoles = {}
-  IterateRoles(function (Role, key)
-    Config.Hierarchy[key] = ValidateRole(Role)
-    if registeredRoles[Role.name] then
+  local roles = {}
+  IterateRoles(function (Role)
+    local role = ValidateRole(Role)
+    if roles[Role.name] then
       error('Role \'' .. Role.name .. '\' already exists')
     end
-    registeredRoles[Role.name] = true
+    roles[Role.name] = role
   end)
+  Config.Hierarchy = roles
 
-  if not registeredRoles.everyone then
-    table.insert(Config.Hierarchy, {
+  if not roles.everyone then
+    Config.Hierarchy.everyone = {
       name = 'everyone'
-    })
+    }
   end
 end
 
