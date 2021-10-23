@@ -72,13 +72,14 @@ end
 function ArrayToString(arr, sep)
   local str = ''
   if not sep then sep = ', ' end
-  for name, index in ipairs(arr) do
+  for index, name in ipairs(arr) do
     if index == #arr then
       str = str .. name
     else
       str = str .. name .. sep
     end
   end
+  return str
 end
 
 function ParsePlayerIdentifiers (source)
