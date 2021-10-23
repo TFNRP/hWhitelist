@@ -19,6 +19,7 @@ if Config.Convars.Discord then
     Wait(0)
 
     local success, data = DiscordFetchMember(identifiers.discord)
+    local whitelists = nil
     if not success then
       if data.code ~= 404 then
         -- something went wrong
@@ -30,7 +31,7 @@ if Config.Convars.Discord then
       goto finalise
     end
 
-    local whitelists = GetDiscordRoleWhitelists()
+    whitelists = GetDiscordRoleWhitelists()
     if not roleCache[identifiers.discord] then
       roleCache[identifiers.discord] = {}
     end
