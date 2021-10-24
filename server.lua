@@ -4,7 +4,7 @@ ExecuteConfig()
 
 AddEventHandler('onResourceStop', function (name)
   if name == GetCurrentResourceName() then
-    ExecuteConfig(RemoveRoleAce, RemoveRoleAcePrincipal)
+    ExecuteConfig(RemoveRoleAce, RemoveRolePrincipal)
   end
 end)
 

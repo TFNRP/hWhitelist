@@ -124,13 +124,13 @@ function AddRoleAce (role, ace, allow)
   ExecuteCommand('add_ace hwhitelist.role.' .. role .. ' "' .. ace .. '" ' .. allow)
 end
 
-function AddRoleAcePrincipal (role, ace, allow)
+function AddRolePrincipal (role, ace, allow)
   if allow == false then
     allow = 'deny'
   else
     allow = 'allow'
   end
-  ExecuteCommand('add_ace ' .. ace .. ' "hwhitelist.role.' .. role .. '" ' .. allow)
+  ExecuteCommand('add_principal ' .. ace .. ' hwhitelist.role.' .. role)
 end
 
 function RemoveRoleAce (role, ace, allow)
@@ -142,13 +142,13 @@ function RemoveRoleAce (role, ace, allow)
   ExecuteCommand('remove_ace hwhitelist.role.' .. role .. ' "' .. ace .. '" ' .. allow)
 end
 
-function RemoveRoleAcePrincipal (role, ace, allow)
+function RemoveRolePrincipal (role, ace, allow)
   if allow == false then
     allow = 'deny'
   else
     allow = 'allow'
   end
-  ExecuteCommand('remove_ace ' .. ace .. ' "hwhitelist.role.' .. role .. '" ' .. allow)
+  ExecuteCommand('remove_principal ' .. ace .. ' hwhitelist.role.' .. role)
 end
 
 function RemovePlayerWhitelist (player, whitelist)
@@ -226,7 +226,7 @@ end
 
 function ExecuteConfig(SetRoleAce, SetRoleAceOwner)
   if not SetRoleAce then SetRoleAce = AddRoleAce end
-  if not SetRoleAceOwner then SetRoleAceOwner = AddRoleAcePrincipal end
+  if not SetRoleAceOwner then SetRoleAceOwner = AddRolePrincipal end
   IterateRoles(function (Role)
     if Role.group then
       local Group = Config.Groups[Role.group]
