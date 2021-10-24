@@ -59,7 +59,7 @@ Config = {
         'hwhitelist.whitelist.add.all',
         'hwhitelist.whitelist.remove.all',
         'hwhitelist.whitelist.manage',
-        'hwhitelist.commands.refresh',
+        'hwhitelist.command.refresh',
       },
     },
 
@@ -69,7 +69,7 @@ Config = {
       group = 'staff',
       allowed = {
         'hwhitelist.whitelist.manage',
-        'hwhitelist.commands.refresh',
+        'hwhitelist.command.refresh',
       },
     },
 
@@ -106,8 +106,8 @@ Config = {
       displayName = 'Member',
       group = 'member',
       allowed = {
-        'hwhitelist.commands.info', -- Allows everyone to use the info command (/hwl info)
-        'hwhitelist.commands.me', -- Allows everyone to see what they're whitelisted for (/hwl me)
+        'hwhitelist.command.info', -- Allows everyone to use the info command (/hwl info)
+        'hwhitelist.command.me', -- Allows everyone to see what they're whitelisted for (/hwl me)
       },
     },
   },

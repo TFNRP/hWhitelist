@@ -130,7 +130,7 @@ RegisterFrameworkCommand({ 'hwhitelist', 'hwl' }, function (source, args, raw)
   if handle == nil then
     return CommandMessage(source, 'unknown command \'' .. handleId .. '\'')
   end
-  if not IsPlayerAceAllowed(source, 'hwhitelist.commands.' .. handleId) then
+  if not IsPlayerAceAllowed(source, 'hwhitelist.command.' .. handleId) then
     return CommandMessage(source, 'you are not authorised to use this command')
   end
   handle(source, args, raw)
