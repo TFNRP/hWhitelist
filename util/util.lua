@@ -264,6 +264,14 @@ function ExecuteConfig(SetRoleAce, SetRoleAceOwner)
       end
     end
   end)
+
+  for _, serverId in ipairs(GetPlayers()) do
+    if SetRoleAce == AddRoleAce then
+      ExecuteCommand('add_principal player.' .. serverId .. ' hwhitelist.role.everyone')
+    else
+      ExecuteCommand('remove_principal player.' .. serverId .. ' hwhitelist.role.everyone')
+    end
+  end
 end
 
 function ValidateConvars (Convars)
@@ -382,11 +390,6 @@ function ValidateRole (Role)
       Role.deniedPrincipal = { Role.deniedPrincipal }
     else
       error('<Role>.deniedPrincipal must be type of string, table or nil, got \'' .. type(Role.deniedPrincipal) .. '\'')
-    end
-  end
-  if Role.name == 'everyone' then
-    if not Role.allowedPrincipal then
-      Role.allowedPrincipal = { 'builtin.everyone' }
     end
   end
 

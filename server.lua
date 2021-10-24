@@ -8,16 +8,15 @@ AddEventHandler('onResourceStop', function (name)
   end
 end)
 
-if Config.Convars.Discord then
-  local roleCache = {}
+local roleCache = {}
 
-  AddEventHandler('playerConnecting', function (name, setKickReason, deferrals)
-    local src = source
-    local identifiers = ParsePlayerIdentifiers(source)
-    if not identifiers.discord then return end
-    deferrals.defer()
-    Wait(0)
+AddEventHandler('playerConnecting', function (name, setKickReason, deferrals)
+  local src = source
+  local identifiers = ParsePlayerIdentifiers(source)
+  deferrals.defer()
+  Wait(0)
 
+  if Config.Convars.Discord and identifiers.discord then
     local success, data = DiscordFetchMember(identifiers.discord)
     local whitelists = nil
     if not success then
@@ -28,7 +27,7 @@ if Config.Convars.Discord then
           Citizen.Trace(json.message .. '\n')
         end
       end
-      goto finalise
+      goto discord_end
     end
 
     whitelists = GetDiscordRoleWhitelists()
@@ -51,22 +50,25 @@ if Config.Convars.Discord then
       end
     end
 
-    ::finalise::
-    deferrals.done()
-  end)
+    ::discord_end::
+  end
 
-  AddEventHandler('playerDropped', function (reason)
-    local src = source
-    local identifiers = ParsePlayerIdentifiers(source)
-    if not identifiers.discord then return end
-    if roleCache[identifiers.discord] then
-      for _, role in roleCache[identifiers.discord] do
-        RemovePlayerWhitelist(src, 'hwhitelist.role.' .. role)
-      end
-      roleCache[identifiers.discord] = nil
+  ExecuteCommand('add_principal player.' .. src .. ' hwhitelist.role.everyone')
+  deferrals.done()
+end)
+
+AddEventHandler('playerDropped', function (reason)
+  local src = source
+  local identifiers = ParsePlayerIdentifiers(source)
+  if not identifiers.discord then return end
+  if roleCache[identifiers.discord] then
+    for _, role in roleCache[identifiers.discord] do
+      RemovePlayerWhitelist(src, 'hwhitelist.role.' .. role)
     end
-  end)
-end
+    roleCache[identifiers.discord] = nil
+  end
+  ExecuteCommand('remove_principal player.' .. src .. ' hwhitelist.role.everyone')
+end)
 
 local commands = {}
 local aliases = {
