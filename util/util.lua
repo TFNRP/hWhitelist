@@ -124,6 +124,15 @@ function AddRoleAce (role, ace, allow)
   ExecuteCommand('add_ace hwhitelist.role.' .. role .. ' "' .. ace .. '" ' .. allow)
 end
 
+function AddRoleAcePrincipal (role, ace, allow)
+  if allow == false then
+    allow = 'deny'
+  else
+    allow = 'allow'
+  end
+  ExecuteCommand('add_ace ' .. ace .. ' "hwhitelist.role.' .. role .. '" ' .. allow)
+end
+
 function RemoveRoleAce (role, ace, allow)
   if allow == false then
     allow = 'deny'
@@ -131,6 +140,15 @@ function RemoveRoleAce (role, ace, allow)
     allow = 'allow'
   end
   ExecuteCommand('remove_ace hwhitelist.role.' .. role .. ' "' .. ace .. '" ' .. allow)
+end
+
+function RemoveRoleAcePrincipal (role, ace, allow)
+  if allow == false then
+    allow = 'deny'
+  else
+    allow = 'allow'
+  end
+  ExecuteCommand('remove_ace ' .. ace .. ' "hwhitelist.role.' .. role .. '" ' .. allow)
 end
 
 function RemovePlayerWhitelist (player, whitelist)
@@ -206,8 +224,9 @@ function ValidateConfig()
   end
 end
 
-function ExecuteConfig(SetRoleAce)
+function ExecuteConfig(SetRoleAce, SetRoleAceOwner)
   if not SetRoleAce then SetRoleAce = AddRoleAce end
+  if not SetRoleAceOwner then SetRoleAceOwner = AddRoleAcePrincipal end
   IterateRoles(function (Role)
     if Role.group then
       local Group = Config.Groups[Role.group]
@@ -231,6 +250,17 @@ function ExecuteConfig(SetRoleAce)
     if Role.denied then
       for _, ace in ipairs(Role.denied) do
         SetRoleAce(Role.name, ace, false)
+      end
+    end
+
+    if Role.allowedPrincipal then
+      for _, ace in ipairs(Role.allowedPrincipal) do
+        SetRoleAceOwner(Role.name, ace)
+      end
+    end
+    if Role.deniedPrincipal then
+      for _, ace in ipairs(Role.deniedPrincipal) do
+        SetRoleAceOwner(Role.name, ace, false)
       end
     end
   end)
@@ -338,6 +368,25 @@ function ValidateRole (Role)
       Role.denied = { Role.denied }
     else
       error('<Role>.denied must be type of string, table or nil, got \'' .. type(Role.denied) .. '\'')
+    end
+  end
+  if Role.allowedPrincipal and not type(Role.allowedPrincipal) == 'table' then
+    if type(Role.allowedPrincipal) == 'string' then
+      Role.allowedPrincipal = { Role.allowedPrincipal }
+    else
+      error('<Role>.allowedPrincipal must be type of string, table or nil, got \'' .. type(Role.allowedPrincipal) .. '\'')
+    end
+  end
+  if Role.deniedPrincipal and not type(Role.deniedPrincipal) == 'table' then
+    if type(Role.deniedPrincipal) == 'string' then
+      Role.deniedPrincipal = { Role.deniedPrincipal }
+    else
+      error('<Role>.deniedPrincipal must be type of string, table or nil, got \'' .. type(Role.deniedPrincipal) .. '\'')
+    end
+  end
+  if Role.name == 'everyone' then
+    if not Role.allowedPrincipal then
+      Role.allowedPrincipal = { 'builtin.everyone' }
     end
   end
 
