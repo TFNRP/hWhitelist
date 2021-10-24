@@ -224,12 +224,12 @@ function ExecuteConfig(SetRoleAce)
     end
 
     if Role.allowed then
-      for ace in ipairs(Role.allowed) do
+      for _, ace in ipairs(Role.allowed) do
         SetRoleAce(Role.name, ace)
       end
     end
     if Role.denied then
-      for ace in ipairs(Role.denied) do
+      for _, ace in ipairs(Role.denied) do
         SetRoleAce(Role.name, ace, false)
       end
     end
