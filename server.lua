@@ -82,10 +82,15 @@ function commands.refresh (source, args, raw)
 end
 
 function commands.me (source, args, raw)
-  local whitelists = GetPlayerWhitelists(source)
+  local whitelists = FilterArray(GetTableKeys(GetPlayerWhitelists(source)), function (value)
+    if value:sub(1, 16) == 'hwhitelist.role.' then
+      return true
+    end
+  end)
   if #whitelists > 0 then
     local str = ''
-    for name, index in ipairs(whitelists) do
+    for index, name in ipairs(whitelists) do
+      name = name:sub(17)
       if index == #whitelists then
         str = str .. name .. '.'
       else
@@ -93,7 +98,7 @@ function commands.me (source, args, raw)
       end
     end
     CommandMessage(source, 'your whitelists:')
-    CommandMessage(source, str, '')
+    TriggerClientEvent('chat:addMessage', source, { args = { str } })
   else
     CommandMessage(source, 'you don\'t have any whitelists')
   end
