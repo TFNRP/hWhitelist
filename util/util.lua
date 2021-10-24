@@ -11,6 +11,8 @@ if RegisterFrameworkCommand == nil then
   end
 end
 
+ActiveWhitelists = {}
+
 function DiscordFetchMember(userId)
   local response = {}
   PerformHttpRequest(
@@ -96,21 +98,23 @@ function ParsePlayerIdentifiers (source)
   return ret
 end
 
-function GetPlayerWhitelists (source)
-  local whitelists = {}
-  for name in pairs(Config.Hierarchy) do
-    if IsPlayerAceAllowed(source, 'hwhitelist.whitelist.role.' .. name) then
-      table.insert(whitelists, name)
-    end
-  end
-  return whitelists
+function GetPlayerWhitelists (player)
+  return ActiveWhitelists[tostring(player)] or {}
 end
 
 function AddPlayerWhitelist (player, whitelist)
   local identifier = ParsePlayerIdentifiers(player)[Config.Convars.PreferredIdentifier]
   if identifier == nil then
+    Citizen.Trace(
+      'Player #' .. player ..
+      ' does not have the preferred identifier \'' .. Config.Convars.PreferredIdentifier ..
+      '\'. Maybe change your `PreferredIdentifier`?' ..
+      '\n'
+    )
     return false
   end
+  if not ActiveWhitelists[player] then ActiveWhitelists[player] = {} end
+  ActiveWhitelists[player][whitelist] = true
   ExecuteCommand('add_principal identifier.' .. Config.Convars.PreferredIdentifier .. ':' .. identifier .. ' ' .. whitelist)
   return true
 end
@@ -154,7 +158,17 @@ end
 function RemovePlayerWhitelist (player, whitelist)
   local identifier = ParsePlayerIdentifiers(player)[Config.Convars.PreferredIdentifier]
   if identifier == nil then
+    Citizen.Trace(
+      'Player #' .. player ..
+      ' does not have the preferred identifier \'' .. Config.Convars.PreferredIdentifier ..
+      '\'. Maybe change your `PreferredIdentifier`?' ..
+      '\n'
+    )
     return false
+  end
+  ActiveWhitelists[player][whitelist] = nil
+  if #ActiveWhitelists[player] < 1 then
+    ActiveWhitelists[player] = nil
   end
   ExecuteCommand('remove_principal identifier.' .. Config.Convars.PreferredIdentifier .. ':' .. identifier .. ' ' .. whitelist)
   return true
@@ -267,9 +281,9 @@ function ExecuteConfig(SetRoleAce, SetRoleAceOwner)
 
   for _, serverId in ipairs(GetPlayers()) do
     if SetRoleAce == AddRoleAce then
-      ExecuteCommand('add_principal player.' .. serverId .. ' hwhitelist.role.everyone')
+      AddPlayerWhitelist(serverId, 'hwhitelist.role.everyone')
     else
-      ExecuteCommand('remove_principal player.' .. serverId .. ' hwhitelist.role.everyone')
+      RemovePlayerWhitelist(serverId, 'hwhitelist.role.everyone')
     end
   end
 end
@@ -394,4 +408,40 @@ function ValidateRole (Role)
   end
 
   return Role
+end
+
+function RemoveAllPlayerWhitelists(player)
+  local object = ActiveWhitelists[player]
+  if object then
+    for whitelist in pairs(object) do
+      RemovePlayerWhitelist(player, whitelist)
+    end
+  end
+  return true
+end
+
+function GetTableValues(object)
+  local values = {}
+  for _, value in pairs(object) do
+    table.insert(values, value)
+  end
+  return values
+end
+
+function GetTableKeys(object)
+  local keys = {}
+  for key in pairs(object) do
+    table.insert(keys, key)
+  end
+  return keys
+end
+
+function FilterArray(array, filter)
+  local built = {}
+  for _, value in ipairs(array) do
+    if filter(value) then
+      table.insert(built, value)
+    end
+  end
+  return built
 end

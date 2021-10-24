@@ -8,8 +8,6 @@ AddEventHandler('onResourceStop', function (name)
   end
 end)
 
-local roleCache = {}
-
 AddEventHandler('playerConnecting', function (name, setKickReason, deferrals)
   local src = source
   local identifiers = ParsePlayerIdentifiers(source)
@@ -31,9 +29,6 @@ AddEventHandler('playerConnecting', function (name, setKickReason, deferrals)
     end
 
     whitelists = GetDiscordRoleWhitelists()
-    if not roleCache[identifiers.discord] then
-      roleCache[identifiers.discord] = {}
-    end
     for _, role in ipairs(data.json.roles) do
       if whitelists[role] then
         local success = AddPlayerWhitelist(src, 'hwhitelist.role.' .. whitelists[role])
@@ -44,8 +39,6 @@ AddEventHandler('playerConnecting', function (name, setKickReason, deferrals)
             ' using preffered identifier '      .. Config.Convars.PreferredIdentifier ..
             '\n'
           )
-        else
-          roleCache[identifiers.discord]:insert(whitelists[role])
         end
       end
     end
@@ -53,21 +46,13 @@ AddEventHandler('playerConnecting', function (name, setKickReason, deferrals)
     ::discord_end::
   end
 
-  ExecuteCommand('add_principal player.' .. src .. ' hwhitelist.role.everyone')
+  AddPlayerWhitelist(src, 'hwhitelist.role.everyone')
   deferrals.done()
 end)
 
 AddEventHandler('playerDropped', function (reason)
   local src = source
-  local identifiers = ParsePlayerIdentifiers(source)
-  if not identifiers.discord then return end
-  if roleCache[identifiers.discord] then
-    for _, role in roleCache[identifiers.discord] do
-      RemovePlayerWhitelist(src, 'hwhitelist.role.' .. role)
-    end
-    roleCache[identifiers.discord] = nil
-  end
-  ExecuteCommand('remove_principal player.' .. src .. ' hwhitelist.role.everyone')
+  RemoveAllPlayerWhitelists(src)
 end)
 
 local commands = {}
